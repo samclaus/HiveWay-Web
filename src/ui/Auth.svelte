@@ -2,24 +2,27 @@
 	import { authenticate, SESSION$ } from "../state/session";
 	import TextField from "./widgets/TextField.svelte";
 
-	let register = false;
-	let username = "";
-	let password = "";
-	let regToken = "";
-	let email = "";
-	let errText = "";
+	let register = $state(false);
+	let username = $state("");
+	let password = $state("");
+	let regToken = $state("");
+	let email = $state("");
 
-	$: authenticating = $SESSION$.state === "authenticating";
-	$: if ($SESSION$.state !== "logged-out" || $SESSION$.authErr === undefined) {
-		errText = "";
-	} else {
-		const authErr = $SESSION$.authErr;
+	let authenticating = $derived($SESSION$.state === "authenticating");
+	let errText: string = $derived.by(() => {
+      if ($SESSION$.state !== "logged-out" || $SESSION$.authErr === undefined) {
+      	return "";
+      }
 
-		// TODO: need standard error formatting machinery with i18n
-		errText = `Login failed: ${authErr instanceof Error ? authErr.message : "" + authErr}`;
-	}
+      const authErr = $SESSION$.authErr;
 
-	function handleFormSubmit(): void {
+      // TODO: need standard error formatting machinery with i18n
+      return `Login failed: ${authErr instanceof Error ? authErr.message : "" + authErr}`;
+	});
+
+	function onsubmit(ev: SubmitEvent): void {
+	    ev.preventDefault();
+
 		authenticate(register ? {
 			registration_token: regToken,
 			username,
@@ -44,19 +47,19 @@
 		<button
 			class="tab login"
 			class:active={!register}
-			on:click={() => register = false}>
+			onclick={() => register = false}>
 			Login
 		</button>
 		<button
 			class="tab register"
 			class:active={register}
-			on:click={() => register = true}>
+			onclick={() => register = true}>
 			Register
 		</button>
 	</div>
 	<form
 		class="legible-width"
-		on:submit|preventDefault={handleFormSubmit}>
+		{onsubmit}>
 
 		<h2>
 			{#if register}

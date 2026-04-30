@@ -52,7 +52,7 @@
                         label="Delete"
                         icon="delete"
                         color="warn"
-                        on:click={() => showDeleteUI(user.id)} />
+                        onclick={() => showDeleteUI(user.id)} />
                 {/if}
             </div>
         </li>

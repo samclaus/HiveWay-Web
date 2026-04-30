@@ -24,20 +24,30 @@
 
 </label>
 
-<script lang="ts" context="module">
+<script lang="ts" module>
     let counter = 0;
 </script>
 
 <script lang="ts">
     import { onMount } from "svelte";
 
-    export let label: string;
-    export let hint: string | undefined = undefined;
-    export let value: string | undefined;
-    export let required = false;
-    export let maxlength: number | undefined = undefined;
-    export let placeholder: string | undefined = undefined;
-    export let autofocus = false;
+    let {
+      label,
+      hint,
+      value = $bindable(),
+      required = false,
+      maxlength,
+      placeholder,
+      autofocus = false,
+    }: {
+      label: string;
+      hint?: string | undefined;
+      value: string | undefined;
+      required?: boolean | undefined;
+      maxlength?: number | undefined;
+      placeholder?: string | undefined;
+      autofocus?: boolean | undefined;
+    } = $props();
 
     const inputID = `hw-textarea-${counter++}`;
 

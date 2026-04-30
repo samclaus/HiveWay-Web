@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
     import { cubicOut } from "svelte/easing";
     import { get, writable } from "svelte/store";
     import { type TransitionConfig } from "svelte/transition";
@@ -110,6 +110,10 @@
     }
 
     function handleModalKeydown(ev: KeyboardEvent): void {
+        // Ported from Svelte 4 'self' event modifier
+        if (ev.currentTarget !== ev.target) {
+          return;
+        }
         if (ev.key === "Tab" && ev.shiftKey) {
             ev.preventDefault();
         }
@@ -118,28 +122,29 @@
 
 <div
     class="container"
-    on:keydown={onContainerKeydown}
+    onkeydown={onContainerKeydown}
     role="none">
 
-    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <!-- svelte-ignore a11y_click_events_have_key_events -->
     <div
         class="backdrop"
         class:visible={!!$current}
-        on:click={onBackdropClick}
+        onclick={onBackdropClick}
         role="none"
-    />
+    ></div>
 
     {#if $current}
+        {@const ModalComponent = $current[0]}
         <div class="modal-scroller">
-            <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+            <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
             <dialog
                 id="hw-modal"
                 open
                 transition:slideScaleFade
-                on:keydown|self={handleModalKeydown}>
-                <svelte:component this={$current[0]} {...$current[1]} />
+                onkeydown={handleModalKeydown}>
+                <ModalComponent {...$current[1]} />
             </dialog>
-            <a aria-hidden="true" href="#hw-modal" on:focus={clickTarget}>
+            <a aria-hidden="true" href="#hw-modal" onfocus={clickTarget}></a>
         </div>
     {/if}
 

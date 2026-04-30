@@ -3,15 +3,20 @@
     import { onDestroy } from "svelte";
     import type { CircleInfo } from "../../state/project-features";
 
-    export let map: L.Map;
-    export let circle: CircleInfo;
+    let {
+      map,
+      circle,
+    }: {
+      map: L.Map;
+      circle: CircleInfo;
+    } = $props();
 
     const layer = new L.Circle(new L.LatLng(...circle.center), circle.styles);
     map.addLayer(layer);
 
-    $: layer.setLatLng(new L.LatLng(...circle.center));
-    $: layer.setRadius(circle.radius_meters);
-    $: layer.setStyle(circle.styles);
+    $effect(() => layer.setLatLng(new L.LatLng(...circle.center)));
+    $effect(() => layer.setRadius(circle.radius_meters));
+    $effect(() => layer.setStyle(circle.styles));
 
     onDestroy(() => map.removeLayer(layer));
 </script>

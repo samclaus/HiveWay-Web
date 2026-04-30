@@ -4,17 +4,19 @@
     import TextArea from '../widgets/TextArea.svelte';
     import TextField from '../widgets/TextField.svelte';
 
-    export let proj: ProjectInfo | undefined = undefined;
+    let { proj }: { proj?: ProjectInfo | undefined } = $props();
 
-    let name = '';
-    let desc = '';
+    let name = $state('');
+    let desc = $state('');
 
     if (proj) {
         name = proj.name;
         desc = proj.desc;
     }
 
-    function submit(): void {
+    function onsubmit(ev: SubmitEvent): void {
+        ev.preventDefault();
+
         if (proj) {
             modifyProjectMetadata({
                 id: proj.id,
@@ -30,7 +32,7 @@
         complete();
     }
 </script>
-<form on:submit|preventDefault={submit}>
+<form {onsubmit}>
 
     <h2>
         {#if proj}
@@ -60,7 +62,7 @@
 
     <div class="form-actions">
 
-        <button type="button" on:click={cancel}>
+        <button type="button" onclick={cancel}>
             Cancel
         </button>
 

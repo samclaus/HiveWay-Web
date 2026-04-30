@@ -5,45 +5,32 @@
     import Icon from "../widgets/Icon.svelte";
     import IconButton from "../widgets/IconButton.svelte";
 
-    export let map: L.Map;
+    let { map }: { map: L.Map; } = $props();
 
-    const enum FeatureType {
-        Stop,
-        Polyline,
-        Polygon,
-        Circle,
-    }
-    const FEATURE_TYPES: { readonly [Type in FeatureType]: string } = [
-        "Stop",
-        "Polyline",
-        "Polygon",
-        "Circle",
-    ];
+    type FeatureType = "Stop" | "Polyline" | "Polygon" | "Circle";
     type FeatureModel = [FeatureType, string, string];
 
-    let features: FeatureModel[] = [];
+    let features: FeatureModel[] = $derived.by(() => {
+      // TODO: reuse existing model array and make sure that clearing it doesn't cause
+      // Svelte to do extra work
+      const f = $PROJECT_FEATURES, models: FeatureModel[] = [];
 
-    $: {
-        const f = $PROJECT_FEATURES;
+      for (const s of f.stops) {
+          models.push(["Stop", s.id, s.name]);
+      }
+      for (const p of [...f.paths].sort((l, r) => (+l.line) - (+r.line))) {
+          models.push([
+              p.line ? "Polyline" : "Polygon",
+              p.id,
+              p.name,
+          ]);
+      }
+      for (const c of f.circles) {
+          models.push(["Circle", c.id, c.name]);
+      }
 
-        features.length = 0; // TODO: does this cause additional Svelte work?
-
-        for (const s of f.stops) {
-            features.push([FeatureType.Stop, s.id, s.name]);
-        }
-        for (const p of [...f.paths].sort((l, r) => (+l.line) - (+r.line))) {
-            features.push([
-                p.line ? FeatureType.Polyline : FeatureType.Polygon,
-                p.id,
-                p.name,
-            ]);
-        }
-        for (const c of f.circles) {
-            features.push([FeatureType.Circle, c.id, c.name]);
-        }
-
-        features = features;
-    };
+      return models;
+    });
 
     function onMapClick({ latlng }: any): void {
         // TODO
@@ -51,11 +38,11 @@
 
     function onDeleteClick(type: FeatureType, id: string): void {
         // TODO: error handling
-        if (type === FeatureType.Stop) {
+        if (type === "Stop") {
             deleteStop(id);
-        } else if (type === FeatureType.Polyline || type === FeatureType.Polygon) {
+        } else if (type === "Polyline" || type === "Polygon") {
             deletePath(id);
-        } else if (type === FeatureType.Circle) {
+        } else if (type === "Circle") {
             deleteCircle(id);
         }
     }
@@ -93,13 +80,13 @@
         {#each features as [type, id, name] (id)}
             <li class="card">
                 <h3>{name}</h3>
-                <h4>{FEATURE_TYPES[type]}</h4>
+                <h4>{type}</h4>
                 <div class="card-actions">
                     <IconButton
                         label="Delete"
                         icon="delete"
                         color="warn"
-                        on:click={() => onDeleteClick(type, id)} />
+                        onclick={() => onDeleteClick(type, id)} />
                 </div>
             </li>
         {/each}

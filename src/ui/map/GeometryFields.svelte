@@ -3,20 +3,26 @@
     import Checkbox from "../widgets/Checkbox.svelte";
     import TextField from "../widgets/TextField.svelte";
 
-    export let name: string;
-    export let styles: GeometryStyles;
-    export let strokeOnly = false;
+    let {
+      name = $bindable(),
+      styles = $bindable(),
+      strokeOnly = false,
+    }: {
+      name: string;
+      styles: GeometryStyles;
+      strokeOnly?: boolean | undefined;
+    } = $props();
 
-    let singleColor = true;
-    let fillColor = styles.fillColor || styles.color;
-    let fillOpacity = Math.round(styles.fillOpacity * 100);
+    let singleColor = $state(true);
+    let fillColor = $derived(styles.fillColor || styles.color);
+    let fillOpacity = $derived(Math.round(styles.fillOpacity * 100));
 
-    $: {
+    $effect(() => {
         styles.fillColor = singleColor ? undefined : fillColor;
         styles.fillOpacity = fillOpacity / 100;
-    }
+    });
 </script>
-    
+
 <TextField
     label="Name"
     hint="What does this geometry represent?"

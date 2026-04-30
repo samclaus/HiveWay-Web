@@ -15,7 +15,7 @@
 
     function copyToken(inputID: string): void {
         const input = document.getElementById(inputID) as HTMLInputElement;
-        
+
         if (input) {
             input.focus();
             input.select();
@@ -34,7 +34,7 @@
 
     <ul class="card-grid">
         <li class="card--new">
-            <button use:autofocus on:click={() => show(RegTokenCreate)}>
+            <button use:autofocus onclick={() => show(RegTokenCreate)}>
                 <Icon name="plus" size={72} />
                 <h3>New Token</h3>
                 <p>
@@ -82,12 +82,12 @@
                     label="Delete"
                     icon="delete"
                     color="warn"
-                    on:click={() => deleteRegistrationToken(token.id)} />
+                    onclick={() => deleteRegistrationToken(token.id)} />
                 <IconButton
                     label="Copy token"
                     icon="copy"
                     color="primary"
-                    on:click={() => copyToken(token.id)} />
+                    onclick={() => copyToken(token.id)} />
             </div>
         </li>
         {/each}

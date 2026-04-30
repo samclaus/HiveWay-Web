@@ -27,8 +27,8 @@
     <div class="app-shell isolate">
         <nav>
             <Breadcrumbs />
-            <div class="flex-grow" />
-            <button class="main-menu" on:click={logout}>
+            <div class="flex-grow"></div>
+            <button class="main-menu" onclick={logout}>
                 {$MY_INFO$.name} - click to log out
             </button>
         </nav>

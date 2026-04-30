@@ -37,7 +37,7 @@
 
     <ul class="card-grid">
         <li class="card--new">
-            <button use:autofocus on:click={() => show(ProjectSave)}>
+            <button use:autofocus onclick={() => show(ProjectSave)}>
                 <Icon name="plus" size={72} />
                 <h3>New Project</h3>
                 <p>
@@ -72,12 +72,12 @@
                 <IconButton
                     label="Edit"
                     icon="edit"
-                    on:click={() => show(ProjectSave, { proj })} />
+                    onclick={() => show(ProjectSave, { proj })} />
                 <IconButton
                     label="Delete"
                     icon="delete"
                     color="warn"
-                    on:click={() => showDeleteUI(proj)} />
+                    onclick={() => showDeleteUI(proj)} />
             </div>
         </li>
         {/each}

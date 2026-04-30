@@ -6,10 +6,10 @@
     import GeometryFields from "./GeometryFields.svelte";
     import { defaultGeometryStyles } from "./core";
 
-    export let map: L.Map;
+    let { map }: { map: L.Map; } = $props();
 
-    let name = "";
-    let styles = defaultGeometryStyles();
+    let name = $state("");
+    let styles = $state(defaultGeometryStyles());
 
     const polygon = new L.Polygon([], { opacity: 1 });
     const previewLine = new L.Polyline([], {
@@ -18,10 +18,10 @@
         dashArray: "10 10",
     });
 
-    let coords: L.LatLng[] = [];
+    let coords: L.LatLng[] = $state([]);
 
-    $: polygon.setStyle(styles);
-    $: previewLine.setStyle({ weight: styles.weight });
+    $effect(() => polygon.setStyle(styles));
+    $effect(() => previewLine.setStyle({ weight: styles.weight }));
 
     function onMapMousemove({ latlng }: any): void {
         if (coords.length > 0) {
@@ -70,7 +70,9 @@
         coords = coords; // for Svelte
     }
 
-    function submit(): void {
+    function onsubmit(ev: SubmitEvent): void {
+        ev.preventDefault();
+
         // TODO: async handling w/ task system
         createPath({
             line: false,
@@ -107,14 +109,14 @@
     <div class="toolbar sticky">
         <h2>Creating Polygon</h2>
     </div>
-    <form on:submit|preventDefault={submit}>
+    <form {onsubmit}>
         <div class="form-fields">
 
             <GeometryFields bind:name bind:styles />
 
         </div>
         <div class="form-actions">
-            <button type="button" on:click={cancel}>
+            <button type="button" onclick={cancel}>
                 Cancel
             </button>
             <button type="submit" class="filled">

@@ -7,12 +7,14 @@
     import TextArea from '../widgets/TextArea.svelte';
     import TextField from '../widgets/TextField.svelte';
 
-    let name = '';
-    let id = '';
-    let admin = false;
-    let notes = '';
+    let name = $state('');
+    let id = $state('');
+    let admin = $state(false);
+    let notes = $state('');
 
-    function submit(): void {
+    function onsubmit(ev: SubmitEvent): void {
+        ev.preventDefault();
+
         createRegistrationToken({
             id,
             name,
@@ -22,7 +24,7 @@
         complete();
     }
 </script>
-<form on:submit|preventDefault={submit}>
+<form {onsubmit}>
 
     <h2>Create a new registration token</h2>
 
@@ -76,7 +78,7 @@
 
     <div class="form-actions">
 
-        <button type="button" on:click={cancel}>
+        <button type="button" onclick={cancel}>
             Cancel
         </button>
 

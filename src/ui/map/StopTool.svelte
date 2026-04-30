@@ -8,7 +8,7 @@
     import TextArea from "../widgets/TextArea.svelte";
     import TextField from "../widgets/TextField.svelte";
 
-    export let map: L.Map;
+    let { map }: { map: L.Map; } = $props();
 
     const marker = new L.Marker(
         new L.LatLng(0, 0),
@@ -23,11 +23,13 @@
         },
     );
 
-    let spec: StopSpec | undefined;
+    let spec: StopSpec | undefined = $state();
 
-    $: if (spec?.type === StopType.Station) {
-        spec.parent_station = undefined;
-    }
+    $effect(() => {
+      if (spec?.type === StopType.Station) {
+          spec.parent_station = undefined;
+      }
+    });
 
     function onMapClick({ latlng }: any): void {
         marker.setLatLng(latlng);
@@ -65,7 +67,9 @@
         map.removeLayer(marker);
     }
 
-    function submit(): void {
+    function onsubmit(ev: SubmitEvent): void {
+        ev.preventDefault();
+
         if (spec) {
             // TODO: async handling w/ task system
             createStop(spec).then(
@@ -80,7 +84,7 @@
     <div class="toolbar sticky">
         <h2>Creating Stop</h2>
     </div>
-    <form on:submit|preventDefault={submit}>
+    <form {onsubmit}>
         <div class="form-fields">
 
             <TextField
@@ -89,7 +93,7 @@
                 bind:value={spec.name}
                 required
                 autofocus />
-    
+
             <TextField
                 label="Text-to-Speech Name"
                 hint="What ADA systems will announce verbally; should be free of abbreviations and contractions"
@@ -99,7 +103,7 @@
                 label="Code"
                 hint="Customer-facing *short* identifier, such as a number for use in a phone-based stop predictions service (e.g. 0473)"
                 bind:value={spec.code} />
-    
+
             <TextArea
                 label="Description"
                 hint="Useful information for recognizing/using the stop"
@@ -164,7 +168,7 @@
 
         </div>
         <div class="form-actions">
-            <button type="button" on:click={cancel}>
+            <button type="button" onclick={cancel}>
                 Cancel
             </button>
             <button type="submit" class="filled">

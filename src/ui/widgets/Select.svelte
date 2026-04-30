@@ -13,7 +13,7 @@
             {required}
             bind:this={selectEl}
             bind:value>
-            <slot />
+            {@render children()}
         </select>
     </div>
 
@@ -23,18 +23,28 @@
 
 </label>
 
-<script lang="ts" context="module">
+<script lang="ts" module>
     let counter = 0;
 </script>
 
 <script lang="ts">
-    import { onMount } from "svelte";
+    import { onMount, type Snippet } from "svelte";
 
-    export let label: string;
-    export let hint: string | undefined = undefined;
-    export let value: any;
-    export let required = false;
-    export let autofocus = false;
+    let {
+      label,
+      hint,
+      value = $bindable(),
+      required = false,
+      autofocus = false,
+      children,
+    }: {
+      label: string;
+      hint?: string | undefined;
+      value: any;
+      required?: boolean | undefined;
+      autofocus?: boolean | undefined;
+      children: Snippet;
+    } = $props();
 
     const selectID = `hw-select-${counter++}`;
 

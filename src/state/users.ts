@@ -1,4 +1,4 @@
-import { decode, encode } from "msgpack-ts";
+import { decode, encode } from "msgpack-es";
 import { rx } from "../rx";
 import { request } from "./session";
 import type { Rank, UserInfo } from "../backend/user";

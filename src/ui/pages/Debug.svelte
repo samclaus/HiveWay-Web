@@ -1,13 +1,13 @@
 <main class="padding-heavy">
     <h1>Request/Response Debugging</h1>
-    <form on:submit|preventDefault={sendRequest}>
+    <form onsubmit={e => { e.preventDefault(); sendRequest(); }}>
         <h3>Request</h3>
         <div class="form-fields">
             <TextField label="Request Type" bind:value={requestType} autofocus />
             <TextField label="Request JSON" bind:value={requestJSON} />
         </div>
         <div class="form-actions">
-            <button type="button" on:click={benchmark}>Benchmark</button>
+            <button type="button" onclick={benchmark}>Benchmark</button>
             <button type="submit" class="filled">Send request</button>
         </div>
     </form>
@@ -18,13 +18,13 @@
 </main>
 
 <script lang="ts">
-import { decode, encode } from "msgpack-ts";
+import { decode, encode } from "msgpack-es";
 import { request } from "../../state/session";
 import TextField from "../widgets/TextField.svelte";
 
-let requestType = "user:list";
-let requestJSON = "";
-let responseText = "";
+let requestType = $state("user:list");
+let requestJSON = $state("");
+let responseText = $state("");
 
 function parseRequest(): any {
     try {
@@ -38,7 +38,7 @@ function sendRequest(): void {
     request(requestType, encode(parseRequest())).then(
         res => {
             responseText = "";
-            
+
             if (res.length) {
                 responseText += JSON.stringify(decode(res), undefined, 4);
             }
@@ -87,10 +87,6 @@ sendRequest();
 </script>
 
 <style>
-    h2 {
-        text-align: center;
-    }
-
     form,
     .response-container {
         margin: 100px auto;

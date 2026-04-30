@@ -6,21 +6,21 @@
     import GeometryFields from "./GeometryFields.svelte";
     import { defaultGeometryStyles } from "./core";
 
-    export let map: L.Map;
+    let { map }: { map: L.Map; } = $props();
 
-    let name = "";
-    let styles = defaultGeometryStyles();
+    let name = $state("");
+    let styles = $state(defaultGeometryStyles());
 
     const circle = new L.Circle(new L.LatLng(0, 0), {
         ...styles,
         interactive: false,
     });
 
-    let center: L.LatLng | undefined;
-    let radiusMeters = 100;
+    let center: L.LatLng | undefined = $state();
+    let radiusMeters = $state(100);
 
-    $: circle.setRadius(radiusMeters);
-    $: circle.setStyle(styles);
+    $effect(() => circle.setRadius(radiusMeters));
+    $effect(() => circle.setStyle(styles));
 
     function onMapClick({ latlng }: any): void {
         center = latlng as L.LatLng;
@@ -40,11 +40,13 @@
         center = undefined;
     }
 
-    function submit(): void {
+    function onsubmit(ev: SubmitEvent): void {
+        ev.preventDefault();
+
         if (!center) {
             return;
         }
-    
+
         // TODO: async handling w/ task system
         createCircle({
             center: [center.lat, center.lng],
@@ -62,7 +64,7 @@
     <div class="toolbar sticky">
         <h2>Creating Circle</h2>
     </div>
-    <form on:submit|preventDefault={submit}>
+    <form {onsubmit}>
         <div class="form-fields">
 
             <label>
@@ -74,7 +76,7 @@
 
         </div>
         <div class="form-actions">
-            <button type="button" on:click={cancel}>
+            <button type="button" onclick={cancel}>
                 Cancel
             </button>
             <button type="submit" class="filled">

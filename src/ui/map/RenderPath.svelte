@@ -3,8 +3,13 @@
     import { onDestroy } from "svelte";
     import type { PathInfo } from "../../state/project-features";
 
-    export let map: L.Map;
-    export let path: PathInfo;
+    let {
+      map,
+      path,
+    }: {
+      map: L.Map;
+      path: PathInfo;
+    } = $props();
 
     function unpackPathCoords(packed: number[]): L.LatLng[] {
         const coords = new Array<L.LatLng>(
@@ -22,8 +27,8 @@
 
     map.addLayer(layer);
 
-    $: layer.setLatLngs(unpackPathCoords(path.coords));
-    $: layer.setStyle(path.styles);
+    $effect(() => layer.setLatLngs(unpackPathCoords(path.coords)));
+    $effect(() => layer.setStyle(path.styles));
 
     onDestroy(() => map.removeLayer(layer));
 </script>

@@ -1,12 +1,18 @@
 <script lang="ts">
     import { autofocus } from '../actions/autofocus';
     import { cancel, complete } from '../widgets/ModalContainer.svelte';
-    
-    export let title: string;
-    export let body: string;
-    export let confirmLabel: string;
+
+    let {
+      title,
+      body,
+      confirmLabel,
+    }: {
+      title: string;
+      body: string;
+      confirmLabel: string;
+    } = $props();
 </script>
-<form on:submit|preventDefault={() => complete()}>
+<form onsubmit={e => { e.preventDefault(); complete(); }}>
 
     <h2>
         {title}
@@ -18,7 +24,7 @@
 
     <div class="form-actions">
 
-        <button type="button" on:click={cancel} use:autofocus>
+        <button type="button" onclick={cancel} use:autofocus>
             Cancel
         </button>
 

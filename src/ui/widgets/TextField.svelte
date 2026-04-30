@@ -15,7 +15,7 @@
         {placeholder}
         value={value || ""}
         bind:this={inputEl}
-        on:input={onInput}>
+        oninput={onInput}>
 
     <div class="input-helpers">
         <div class="input-hint">{hint || ""}</div>
@@ -26,21 +26,32 @@
 
 </label>
 
-<script lang="ts" context="module">
+<script lang="ts" module>
     let counter = 0;
 </script>
 
 <script lang="ts">
     import { onMount } from "svelte";
 
-    export let type: "text" | "email" | "password" = "text";
-    export let label: string;
-    export let hint: string | undefined = undefined;
-    export let value: string | undefined;
-    export let required = false;
-    export let maxlength: number | undefined = undefined;
-    export let placeholder: string | undefined = undefined;
-    export let autofocus = false;
+    let {
+      type = "text",
+      label,
+      hint = undefined,
+      value = $bindable(),
+      required = false,
+      maxlength = undefined,
+      placeholder = undefined,
+      autofocus = false,
+    }: {
+      type?: "text" | "email" | "password" | undefined;
+      label: string;
+      hint?: string | undefined;
+      value: string | undefined;
+      required?: boolean | undefined;
+      maxlength?: number | undefined;
+      placeholder?: string | undefined;
+      autofocus?: boolean | undefined;
+    } = $props();
 
     const inputID = `hw-textfield-${counter++}`;
 

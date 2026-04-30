@@ -1,19 +1,24 @@
 <script lang="ts">
     import * as L from "leaflet-lite";
     import "leaflet-lite/styles";
-    import { createEventDispatcher, onDestroy, onMount } from "svelte";
+    import { onDestroy, onMount } from "svelte";
     import { PROJECT_FEATURES, refreshProjectFeatures } from "../../state/project-features";
     import { RenderCircle, RenderPath, RenderStop } from "../map";
 
-    export let projID: string;
-    export let nonInteractive = false;
+    let {
+      projID,
+      nonInteractive = false,
+      onload,
+    }: {
+      projID: string;
+      nonInteractive?: boolean | undefined;
+      onload?: ((map: L.Map) => void) | undefined;
+    } = $props();
 
     // This will not be assigned a value until Svelte calls onMount()...
     let mapContainer: HTMLDivElement;
     // ...which will then allow us to initialize the map instance.
-    let map: L.Map;
-
-    const dispatch = createEventDispatcher<{ load: L.Map; }>();
+    let map: L.Map = $state();
 
     refreshProjectFeatures();
 
@@ -50,7 +55,7 @@
             ),
         );
 
-        dispatch("load", map);
+        onload?.(map);
     });
 
     onDestroy((): void => {
@@ -58,7 +63,7 @@
     });
 </script>
 
-<div class="project-map" bind:this={mapContainer} />
+<div class="project-map" bind:this={mapContainer}></div>
 
 {#if map}
     {@const features = $PROJECT_FEATURES}

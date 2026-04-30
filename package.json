@@ -1,25 +1,27 @@
 {
-  "name": "hiveway-planner",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "check": "svelte-check --tsconfig ./tsconfig.json"
-  },
-  "devDependencies": {
-    "@sveltejs/vite-plugin-svelte": "^3.0.1",
-    "@tsconfig/svelte": "^5.0.2",
-    "leaflet-lite": "^0.3.0",
-    "msgpack-ts": "^2.0.0",
-    "svelte": "^4.2.8",
-    "svelte-check": "^3.6.2",
-    "svelte-spa-router": "^4.0.1",
-    "tippy.js": "^6.3.7",
-    "tslib": "^2.6.2",
-    "typescript": "^5.2.2",
-    "vite": "^5.0.8"
-  }
+	"name": "hiveway-web",
+	"private": true,
+	"version": "0.0.1",
+	"type": "module",
+	"scripts": {
+		"dev": "vite dev",
+		"build": "vite build",
+		"preview": "vite preview",
+		"prepare": "svelte-kit sync || echo ''",
+		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
+	},
+	"devDependencies": {
+		"@sveltejs/adapter-auto": "^7.0.1",
+		"@sveltejs/kit": "^2.57.0",
+		"@sveltejs/vite-plugin-svelte": "^7.0.0",
+		"leaflet-lite": "^0.3.0",
+		"msgpack-es": "^0.0.5",
+		"svelte": "^5.55.2",
+		"svelte-check": "^4.4.6",
+		"svelte-spa-router": "^5.0.1",
+		"tippy.js": "^6.3.7",
+		"typescript": "^6.0.2",
+		"vite": "^8.0.7"
+	}
 }

@@ -15,22 +15,31 @@
             <span class="faded">(REQUIRED)</span>
         {/if}
 
-        <slot />
+        {@render children?.()}
     </div>
 
 </label>
 
-<script lang="ts" context="module">
+<script lang="ts" module>
     let counter = 0;
 </script>
 
 <script lang="ts">
-    import { onMount } from "svelte";
+    import { onMount, type Snippet } from "svelte";
 
-    export let label: string;
-    export let value: boolean;
-    export let required = false;
-    export let autofocus = false;
+    let {
+      label,
+      value = $bindable(),
+      required = false,
+      autofocus = false,
+      children,
+    }: {
+      label: string;
+      value: boolean;
+      required?: boolean | undefined;
+      autofocus?: boolean | undefined;
+      children?: Snippet;
+    } = $props();
 
     const inputID = `hw-checkbox-${counter++}`;
 

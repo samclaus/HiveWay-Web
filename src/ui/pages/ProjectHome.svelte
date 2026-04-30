@@ -5,18 +5,19 @@
     import { ProjectMap } from "../map";
     import Icon from "../widgets/Icon.svelte";
 
-    export let params: {
+    let { params }: {
+      params: {
         id: string;
-    };
+      };
+    } = $props();
 
-    let proj: ProjectInfo | undefined;
+    let proj: ProjectInfo | undefined = $derived($PROJECTS && PROJECTS.get(params.id));
+    let projName = $derived(proj ? proj.name : params.id);
 
-    $: proj = $PROJECTS && PROJECTS.get(params.id);
-    $: projName = proj ? proj.name : params.id;
-    $: BREADCRUMBS.set([
+    $effect(() => BREADCRUMBS.set([
         ["Projects", "/projects"],
         [projName, `/projects/${params.id}`],
-    ]);
+    ]));
 </script>
 
 <main class="padding-heavy">

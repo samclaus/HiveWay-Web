@@ -7,14 +7,16 @@
     import { MAP_TOOLS, ProjectMap, type MapTool } from "../map";
     import IconButton from "../widgets/IconButton.svelte";
 
-    export let params: {
+    let { params }: {
+      params: {
         id: string;
-    };
+      };
+    } = $props();
 
-    let map: L.Map | undefined;
-    let tool: MapTool = "select";
+    let map: L.Map | undefined = $state();
+    let tool: MapTool = $state("select");
 
-    $: {
+    $effect(() => {
         const
             id = params.id,
             name = $PROJECTS && PROJECTS.get(id)?.name || id;
@@ -24,7 +26,7 @@
             [name, `/projects/${id}`],
             ["Map", `/projects/${id}/map`],
         ];
-    }
+    });
 
     onDestroy((): void => {
         map?.dispose();
@@ -34,7 +36,7 @@
 <main>
     <ProjectMap
         projID={params.id}
-        on:load={ev => map = ev.detail} />
+        onload={m => map = m} />
 
     <div class="map-tools">
         <div class="toolbar secondary" role="toolbar">
@@ -42,31 +44,31 @@
                 label="Select"
                 icon="cursor"
                 color={tool === "select" ? "primary" : undefined}
-                on:click={() => tool = "select"}
+                onclick={() => tool = "select"}
                 pressed={tool === "select"} />
             <IconButton
                 label="Create stop"
                 icon="bus-stop"
                 color={tool === "add-stop" ? "primary" : undefined}
-                on:click={() => tool = "add-stop"}
+                onclick={() => tool = "add-stop"}
                 pressed={tool === "add-stop"} />
             <IconButton
                 label="Polyline"
                 icon="polyline"
                 color={tool === "polyline" ? "primary" : undefined}
-                on:click={() => tool = "polyline"}
+                onclick={() => tool = "polyline"}
                 pressed={tool === "polyline"} />
             <IconButton
                 label="Polygon"
                 icon="polygon"
                 color={tool === "polygon" ? "primary" : undefined}
-                on:click={() => tool = "polygon"}
+                onclick={() => tool = "polygon"}
                 pressed={tool === "polygon"} />
             <IconButton
                 label="Circle"
                 icon="circle"
                 color={tool === "circle" ? "primary" : undefined}
-                on:click={() => tool = "circle"}
+                onclick={() => tool = "circle"}
                 pressed={tool === "circle"} />
         </div>
 
@@ -75,7 +77,8 @@
             and that becomes which point you are re-selecting on the map.
         -->
         {#if map}
-            <svelte:component this={MAP_TOOLS[tool]} {map} />
+            {@const ToolsComponent = MAP_TOOLS[tool]}
+            <ToolsComponent {map} />
         {/if}
     </div>
 </main>

@@ -1,4 +1,4 @@
-import { decode, encode } from "msgpack-ts";
+import { decode, encode } from "msgpack-es";
 import { hexEncode } from "../encoding";
 import { Deferred } from "../lib/async-util";
 import { WEBSOCKET_CLOSE_NORMAL, openWebsocket, readBinaryMessage } from "../lib/websocket-util";
@@ -24,15 +24,15 @@ export type AuthRequest = LoginRequest | RegistrationRequest;
 
 /**
  * FOR THE VERSION 0 PROTOCOL (ALL OF THIS CAN CHANGE BETWEEN VERSIONS)
- * 
+ *
  * ### A front-to-back connection message consists of the following, in order:
- * 
+ *
  * 1. A single byte, interpreted as an unsigned integer, which denotes whether
  * the message is a request (value 0) or a stream operation (value is 1)
  * 2. The rest of the bytes will be interpreted according to the type byte above
- * 
+ *
  * For a request, there will be:
- * 
+ *
  * 1. A 4-byte unsigned integer which will be used as the request ID; when the server
  * sends a response down the wire, it will use this ID so the frontend knows which
  * request the response is for. The frontend should increment a counter and use the
@@ -44,9 +44,9 @@ export type AuthRequest = LoginRequest | RegistrationRequest;
  * would (and this is all hypothetical) interpret the bytes as a MessagePack-encoded
  * object containing fields like the name for the discussion. Regarding backwards
  * compatibility, TODO...
- * 
+ *
  * For a stream, there will be:
- * 
+ *
  * 1. A 4-byte unsigned integer which will be used as the stream ID; streams may only be
  * opened by the server and the message will be silently ignored by the server if no stream
  * is open with the provided stream ID.
@@ -63,23 +63,23 @@ export type AuthRequest = LoginRequest | RegistrationRequest;
  * if the 'data' status bit is set (some stream handlers might expect a MessagePack-encoded payload,
  * some might expect raw data say for a file upload, some might expect a mixed structure, and vice
  * versa).
- * 
+ *
  * ### A back-to-front connection message consists of the following, in order:
- * 
+ *
  * 1. A single byte, interpreted as an unsigned integer, which denotes whether
  * the message is a reply (value 0) or a stream operation (value is 1)
  * 2. The rest of the bytes will be interpreted according to the type byte above
- * 
+ *
  * For a reply, there will be:
- * 
+ *
  * 1. A 4-byte unsigned integer which is the request ID this reply corresponds to.
  * 2. A byte which will be zero for success replies and nonzero for error replies.
  * 3. The rest of the bytes should be interpreted as a standard MessagePack-encoded error
  * format (not described here) if the previous byte is nonzero, or according to the request
  * type the reply is for otherwise.
- * 
+ *
  * For a stream, there will be:
- * 
+ *
  * 1. A 4-byte unsigned integer which will be used as the stream ID; if the client does not recognize
  * the stream ID (i.e., a handler is not registered), it should store a buffer of messages for the stream
  * until application-level code does subscribe, at which point the connection-level code can replay the
@@ -136,7 +136,7 @@ export class BackendError extends Error {
      * frontend is expected to provide more context for better feedback if possible.
      */
     declare readonly message: string;
-    
+
     constructor(
         /**
          * The error code, such as "ses-dne" or "course-dne".
@@ -145,7 +145,7 @@ export class BackendError extends Error {
         message: string,
         /**
          * Optional additional details, depending on the error type.
-         * 
+         *
          * This can contain helpful information for the frontend. For instance (this is
          * not currently a REAL example, just hypothetical), if you try to add an entry
          * to a directory but there is a conflicting entry (same name) already present,
@@ -213,7 +213,7 @@ const EMPTY_PAYLOAD = new Uint8Array(0);
  * Transient websocket-based connection to a HiveWay backend/server. Once the underlying
  * websocket closes, the instance is no longer usable and must be replaced with an entirely
  * new one to continue talking to the server.
- * 
+ *
  * This connection only supports version 0 of the websocket protocol (which will be an evolving
  * standard until official release, at which point breaking changes will be demarcated by
  * incrementing the version number). If the handshake from the server indicates that it is using
@@ -223,7 +223,7 @@ export class TransientBackendConn implements BackendTransport {
 
     /**
      * Dial (attempt to connect to) an HiveWay server's websocket endpoint.
-     * 
+     *
      * TODO: timeouts are really a simpler albeit worse solution than giving users the ability to
      * decide when to give up on an operation. Ideally, this function would take an AbortSignal
      * (part of the JavaScript standard) that code outside of this function could trigger to make
@@ -294,7 +294,7 @@ export class TransientBackendConn implements BackendTransport {
         // the browser propagated the promise result and resumed this function we are in. If everything in
         // this function is synchronous code (no promises, callbacks, etc.), it would technically be safe to
         // assume the websocket is not in a closed state yet but even then it's better to be safe rather than
-        // sorry since we would probably add asynchronous steps in the future. 
+        // sorry since we would probably add asynchronous steps in the future.
         //
         // If you are confused about this stuff, that is 100% OK: reasoning about events, callbacks, promises,
         // async functions, and the order the code gets executed in is--I would argue--the hardest part about
@@ -387,7 +387,7 @@ export class TransientBackendConn implements BackendTransport {
         const typeUTF8 = utf8Encoder.encode(type);
 
         if (typeUTF8.length > 255) {
-            // TODO: remove this whole check and just use msgpack-ts encode() function
+            // TODO: remove this whole check and just use msgpack-es encode() function
             // for the type once I implement things properly on the server
             throw new Error(
                 `cannot encode request type "${type}" because its UTF-8 length ` +
@@ -398,7 +398,7 @@ export class TransientBackendConn implements BackendTransport {
 
         const message = new Uint8Array(7 + typeUTF8.length + payload.length);
         const dataView = new DataView(message.buffer);
-        
+
         message[0] = MessageType.RequestReply;
         dataView.setUint32(1, id);
         message.set([0xd9, typeUTF8.length], 5); // str 8 header
@@ -437,7 +437,7 @@ export class TransientBackendConn implements BackendTransport {
 
     /**
      * Send a request but do not await the reply.
-     * 
+     *
      * @throws If message dispatch fails because the websocket is closed, and vice versa.
      */
     async sendIgnoreReply(type: string, payload?: Uint8Array): Promise<void> {
@@ -460,7 +460,7 @@ export class TransientBackendConn implements BackendTransport {
 
         const message = new Uint8Array(6 + payload.length);
         const dataView = new DataView(message.buffer);
-        
+
         message[0] = MessageType.Stream;
         dataView.setUint32(1, streamID);
         message[5] = StreamStatus.Data;
@@ -482,7 +482,7 @@ export class TransientBackendConn implements BackendTransport {
 
         const message = new Uint8Array(6);
         const dataView = new DataView(message.buffer);
-        
+
         message[0] = MessageType.Stream;
         dataView.setUint32(1, streamID);
         message[5] = StreamStatus.Closed;
@@ -623,5 +623,5 @@ export class TransientBackendConn implements BackendTransport {
             }
         }
     }
-    
+
 }
